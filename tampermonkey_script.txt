@@ -1,0 +1,53 @@
+// ==UserScript==
+// @name         CUPB校园网自动登录
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  自动登录校园网
+// @author       zswh
+// @match        https://login.cup.edu.cn/srun_portal_pc?ac_id=1&theme=pro
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @grant        GM_registerMenuCommand
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // === 配置界面 ===
+    GM_registerMenuCommand("设置账号和密码", function() {
+        let user = prompt("请输入学号/用户名", GM_getValue("username", ""));
+        if (user !== null) GM_setValue("username", user);
+
+        let pass = prompt("请输入密码", GM_getValue("password", ""));
+        if (pass !== null) GM_setValue("password", pass);
+
+        alert("保存成功！");
+    });
+
+    // === 自动登录逻辑 ===
+    function waitForElement(selector, callback) {
+        let timer = setInterval(function() {
+            let elem = document.querySelector(selector);
+            if (elem) {
+                clearInterval(timer);
+                callback(elem);
+            }
+        }, 500);
+    }
+
+    // 等待账号输入框出现后执行
+    waitForElement("#username", function(userInput) {
+        let passInput = document.querySelector("#password");
+        let loginBtn  = document.querySelector("#login-account");
+
+        if (passInput && loginBtn) {
+            let username = GM_getValue("username", "");
+            let password = GM_getValue("password", "");
+            userInput.value = username;
+            passInput.value = password;
+            loginBtn.click();
+        }
+    });
+
+    // Your code here...
+})();c
